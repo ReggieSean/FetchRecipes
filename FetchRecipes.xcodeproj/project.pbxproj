@@ -6,8 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		228189D12D2D35D100A93344 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 228189D02D2D35D100A93344 /* DequeModule */; };
+		22ECB1722D3252D80077280A /* RecipeLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 22ECB1712D3252D80077280A /* RecipeLibrary */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		22F7F94C2D2186E800F028F1 /* FetchRecipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FetchRecipes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		22F7F95D2D21873000F028F1 /* RecipeLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RecipeLibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,16 +29,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22ECB1722D3252D80077280A /* RecipeLibrary in Frameworks */,
+				228189D12D2D35D100A93344 /* DequeModule in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		22ECB1702D3252D80077280A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		22F7F9432D2186E800F028F1 = {
 			isa = PBXGroup;
 			children = (
+				22F7F95D2D21873000F028F1 /* RecipeLibrary */,
 				22F7F94E2D2186E800F028F1 /* FetchRecipes */,
+				22ECB1702D3252D80077280A /* Frameworks */,
 				22F7F94D2D2186E800F028F1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +82,8 @@
 			);
 			name = FetchRecipes;
 			packageProductDependencies = (
+				228189D02D2D35D100A93344 /* DequeModule */,
+				22ECB1712D3252D80077280A /* RecipeLibrary */,
 			);
 			productName = FetchRecipes;
 			productReference = 22F7F94C2D2186E800F028F1 /* FetchRecipes.app */;
@@ -94,6 +113,9 @@
 			);
 			mainGroup = 22F7F9432D2186E800F028F1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				228189CF2D2D35D100A93344 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 22F7F94D2D2186E800F028F1 /* Products */;
 			projectDirPath = "";
@@ -324,6 +346,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		228189CF2D2D35D100A93344 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		228189D02D2D35D100A93344 /* DequeModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 228189CF2D2D35D100A93344 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = DequeModule;
+		};
+		22ECB1712D3252D80077280A /* RecipeLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RecipeLibrary;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 22F7F9442D2186E800F028F1 /* Project object */;
 }
