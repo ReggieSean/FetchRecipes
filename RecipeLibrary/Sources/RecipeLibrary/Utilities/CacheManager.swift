@@ -9,19 +9,16 @@ import Foundation
 //import DequeModule
 import SwiftUI
 
-//public protocol AsyncCache{
-//    associatedtype K: AnyObject & Hashable & Sendable
-//    associatedtype V: AnyObject & Sendable
-//    
-//    //Actor isolated functions are implicit async
-//    func addTask(task: (K, Task<V, Never>)) async
-//    func completeTask(key: K, result: V) async
-//    func startChannel() async -> AsyncStream<(K,V)>
-//}
+public protocol AsyncCache{
+    associatedtype K: AnyObject & Hashable & Sendable
+    associatedtype V: AnyObject & Sendable
+    func addTask(task: (K, Task<V, Never>)) async
+    func startChannel() async -> AsyncStream<(K,V)>
+}
 
 //https://developer.apple.com/videos/play/wwdc2021/10132/?time=1797
-actor CacheTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendable> : AsyncDebugLogger{
-  
+actor CacheTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendable> : AsyncCache, AsyncDebugLogger{
+ 
     typealias CachePair = (K , V)
 //    private var currentTaskCount : Int
 //    private let maxTasks : Int
@@ -116,7 +113,7 @@ actor CacheTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendab
 //        }
 //        return nil
 //    }
-    internal func completeTask(key: K, result: V){
+    private func completeTask(key: K, result: V){
         self.pipe!.yield((key, result))
     }
 
@@ -168,7 +165,7 @@ actor FolderCount{
     }
 }
 //Creating this abstract version of file cache increases the complexity of managing serialization when saving and fetching from disk.
-actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendable & Codable> : AsyncDebugLogger{
+actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendable & Codable> : AsyncCache, AsyncDebugLogger{
     typealias FilePair = (K , V)
     private var runningTasks : Set<K>
     private var pipe : AsyncStream<FilePair>.Continuation?

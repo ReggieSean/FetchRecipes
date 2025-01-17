@@ -9,30 +9,35 @@ import Foundation
 import SwiftUI
 import Combine
 
-//String are not Objects because they are value type, so a wrapper that's not modifiable is needed here
-final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
+//String are not Objects because they are value type, so a wrapper that's not modifiable is needed for NSCache's key
+public final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     let key: String
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
             hasher.combine(key)
     }
         
-    static func == (lhs: CacheKey, rhs: CacheKey) -> Bool {
+    public static func == (lhs: CacheKey, rhs: CacheKey) -> Bool {
         return lhs.key == rhs.key
     }
     init (key: String){
         self.key = key
     }
-    var description: String {
+    public var description: String {
         return "\(key)"
     }
 }
+
 @MainActor public class RecipeListViewModel : ObservableObject, AsyncDebugLogger{
-    
+    public enum CacheMode{
+        case memory
+        case disk
+    }
     let services : RecipeService
-//    var cache : any AsyncCache
-    var cache: CacheTaskManager<CacheKey , RecipeDetail>
+    //var cache: CacheTaskManager<CacheKey , RecipeDetail>
+    var cache: any AsyncCache
     var pipeFromCache : AsyncStream<(CacheKey, RecipeDetail)>?
     var loop : Task<Void, Never>?
+    let cacheMode : CacheMode
     @Published public var recipes : [RecipeModel] = []
     @Published public var recipeDetails : [String: RecipeDetail] = [:]
     
@@ -41,10 +46,15 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     /// RecipeListViewModel initializer, implicity acync due to cache limiter actor's initialization
     /// - Parameters:
     ///   - services: RecipeSerivce dependency tuples(stateless)
-    public init(services: RecipeService){
+    public init(services: RecipeService, cacheMode: CacheMode = .memory){
         self.services = services
-        self.cache = CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
-//        self.cache = cache
+        self.cacheMode = cacheMode
+        switch self.cacheMode {
+            case .memory:
+                self.cache = CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200) as any AsyncCache
+            case .disk:
+                self.cache = FileTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000,cacheCountLimit: 200) as any AsyncCache
+        }
     }
     
     deinit{
@@ -56,7 +66,7 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     //2. Using another actor and sync between mainactor and that actor with a sendable await fuction
     //That will cause performance issue when copying large tasks.
     ///start looping and prepare for cahce to update Published variable
-    public func startCache() async {
+    private func startCache<Cache: AsyncCache>(cache: Cache = self.cache) async where Cache.K == CacheKey, Cache.V == RecipeDetail{
         self.pipeFromCache = await cache.startChannel()
         self.loop = Task{
             printF("Loop Started")
@@ -71,13 +81,23 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     
     public func flushCache(){
         self.loop?.cancel()
-        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+        switch self.cacheMode {
+            case .memory:
+                self.cache = CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200) as any AsyncCache
+            case .disk:
+                self.cache = FileTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000,cacheCountLimit: 200) as any AsyncCache
+        }
     }
     
    
     public func getAllRecipes() -> Task<Void, Never>{
         return Task{
-            await self.startCache()
+            switch self.cacheMode {
+                case .memory:
+                    await self.startCache(cache: self.cache as! CacheTaskManager<CacheKey, RecipeDetail>)
+                case .disk:
+                    await self.startCache(cache: self.cache as! CacheTaskManager<CacheKey, RecipeDetail>)
+            }
             let recipes =  await services.allRecipes()
             self.recipes = recipes
         }
@@ -116,7 +136,9 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
         //It seems I could implement the queue on the caller because the Tasks are self contained, an issue is that if you scroll down really quick and scroll back up, the later initiated task in List/UITableView could finish eariler than the  same task initiated previously. (when backend don't guarantee the synchronous sequnece because of network issues), causing a waste of data.
         //One way to mitigate this is to be able to cancel the re-initiation if a you can detect that previous initiation is set in motion by looping over a task queue and the currently runnign task group. But looping takes O(n) and the time will keep growing if you initiated hundreds of tasks at the same time ( Not ideal for smooth UI scrolling when multiple fetch are done). We could use a design similar to LRU cache, and offload that work to actor, since we can recive stream of RecipeDetails asynchronously from pipeFromCache.
         //Return the cross actor class initiated from Main to actor
-        return Task{await cache.addTask(task: (CacheKey(key: recipe.uuid), cacheFetch))}
+        //let task : Task<Void, Never>
+        return Task{}
+
     }
     
     
