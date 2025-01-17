@@ -132,11 +132,12 @@ public class MockRecipeService : AsyncDebugLogger{
     public static func downloadImageWithTimeout(url:  String = "") async -> UIImage{
         do{
                 let randomInt = Int.random(in: 1...100) // Random integer between 1 and 100
-                if randomInt <= 50{
-                    do{try await Task.sleep(for: .seconds(min(randomInt, 5)))}
+                if randomInt <= 90{
+                    let sleepTime = min(randomInt, 3)
+                    do{try await Task.sleep(for: .seconds(sleepTime))}
                     catch{}
-                    printF("Random Time out on \(url) sleeped for \(randomInt) seconds")
-                    return UIImage(named: "404", in: .module, with: nil)!
+                    printF("Random Time out on \(url) sleeped for \(sleepTime) seconds")
+                    return UIImage(named: "404.png", in: .module, with: nil)!
                 }else{
                     if let image : UIImage = try await APIManager.sendHTTPRequestForData(url: URL(string: url as String)!, method: .get, body: nil,
                                                                                       headers: {request in request.setValue("application/json", forHTTPHeaderField: "Content-Type")}
@@ -150,6 +151,6 @@ public class MockRecipeService : AsyncDebugLogger{
             print("Download error for url:\(url)")
         }
         
-        return  UIImage(named: "404", in: .module, with: nil)!
+        return  UIImage(named: "404.png", in: .module, with: nil)!
     }
 }

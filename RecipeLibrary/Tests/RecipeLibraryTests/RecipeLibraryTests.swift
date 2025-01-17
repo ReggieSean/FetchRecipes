@@ -33,7 +33,7 @@ final class RecipeLibraryTests: XCTestCase , Logger{
                 await vm.getRecipe(recipe: recipe).value
             }
         }
-        try await Task.sleep(nanoseconds: 10_000_000)
+        try await Task.sleep(for: .seconds(4))
         
     }
     @MainActor
@@ -63,6 +63,23 @@ final class RecipeLibraryTests: XCTestCase , Logger{
     /// Test fetching every recipe that production endpoint provides with time out sometimes
     @MainActor
     func testGettingProductionRecipeWithTimeOut() async throws {
+        guard let resourceURL = Bundle.module.resourceURL else {
+                print("No resource URL found for module.")
+                return
+            }
+
+            
+        do {
+            let resourceContents = try FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil, options: [])
+            print("Resources in module:")
+            for file in resourceContents {
+                print(file.lastPathComponent)
+            }
+            
+        } catch {
+            print("Failed to list resources: \(error)")
+            
+        }
         let vm = RecipeListViewModel(services: ServiceFactory.get(service: "random_timeout"))
         await vm.getAllRecipes().value
         await withTaskGroup(of: Task<Void,Never>.self){group in
@@ -77,7 +94,7 @@ final class RecipeLibraryTests: XCTestCase , Logger{
         }
         // wait till main actor received all result across actor boundary
         printF("Waiting till actor finsihes")
-        try await Task.sleep(for: .seconds(4))
+        try await Task.sleep(for: .seconds(10))
         XCTAssertTrue(true)
     }
     

@@ -30,7 +30,8 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     
     let services : RecipeService
 //    var cache : any AsyncCache
-    var cache: CacheTaskManager<CacheKey , RecipeDetail>
+//    var cache: CacheTaskManager<CacheKey , RecipeDetail> =  CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+    var cache: FileTaskManager<CacheKey, RecipeDetail> = FileTaskManager(maxTasks: 10, cacheCostLimit: 100,cacheCountLimit: 100)
     var pipeFromCache : AsyncStream<(CacheKey, RecipeDetail)>?
     var loop : Task<Void, Never>?
     @Published public var recipes : [RecipeModel] = []
@@ -43,8 +44,6 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     ///   - services: RecipeSerivce dependency tuples(stateless)
     public init(services: RecipeService){
         self.services = services
-        self.cache = CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
-//        self.cache = cache
     }
     
     deinit{
@@ -71,7 +70,9 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     
     public func flushCache(){
         self.loop?.cancel()
-        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+//        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+        self.cache = FileTaskManager(maxTasks: 10, cacheCostLimit: 100,cacheCountLimit: 100)
+
     }
     
    
@@ -104,7 +105,7 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
         let bigURL = recipe.largePhotoURL
         //This task will inherit MainActor context first because SwiftUI will call getRecipe
         //async let, withTaskGroup, Task{}, and Task.detached{} start tasks immediately
-        //You cannot bind the Task concurrent context with async let and send the Task with current context
+        //You cannot bind the Task concurrent context with async let and send the Task with current context, async let starts tasks immediately
         let cacheFetch : Task<RecipeDetail ,Never> = Task.detached(priority: .background){[downloadImageSerive = services.downloadImage] in
             //if !(await cache.getHit(key: CacheKey(key : uuid))){}
             async let smallPicTask =   await downloadImageSerive(smallURL)
@@ -115,7 +116,7 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
         
         //It seems I could implement the queue on the caller because the Tasks are self contained, an issue is that if you scroll down really quick and scroll back up, the later initiated task in List/UITableView could finish eariler than the  same task initiated previously. (when backend don't guarantee the synchronous sequnece because of network issues), causing a waste of data.
         //One way to mitigate this is to be able to cancel the re-initiation if a you can detect that previous initiation is set in motion by looping over a task queue and the currently runnign task group. But looping takes O(n) and the time will keep growing if you initiated hundreds of tasks at the same time ( Not ideal for smooth UI scrolling when multiple fetch are done). We could use a design similar to LRU cache, and offload that work to actor, since we can recive stream of RecipeDetails asynchronously from pipeFromCache.
-        //Return the cross actor class initiated from Main to actor
+        //Return the cross actor task from Main to actor
         return Task{await cache.addTask(task: (CacheKey(key: recipe.uuid), cacheFetch))}
     }
     

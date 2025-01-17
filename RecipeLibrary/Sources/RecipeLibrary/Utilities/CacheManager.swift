@@ -167,7 +167,8 @@ actor FolderCount{
         return current
     }
 }
-//Creating this abstract version of file cache increases the complexity of managing serialization when saving and fetching from disk.
+
+//Creating this abstract version of disk cache increases the complexity of managing serialization when saving and fetching from disk.
 actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendable & Codable> : AsyncDebugLogger{
     typealias FilePair = (K , V)
     private var runningTasks : Set<K>
@@ -201,7 +202,7 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
                 printF("Created folder at \(url.path)")
             } catch let error{
-               printF("Error when creating cache folder")
+               printF("Error when creating cache folder\(error)")
             }
         }else{
             //in the rare case when some other apps created that folder
@@ -209,7 +210,7 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
         }
     }
     
-    //Function will only be called once during init, no risk of race
+    //Function has no risk of race
     nonisolated private func folderPath() -> URL?{
         return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(folder)
     }
@@ -258,7 +259,6 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
 
     //cannot access AsyncContinuation before fully init
     public func startChannel() -> AsyncStream<(K,V)>{
-       
         return AsyncStream{continuation in
             self.pipe = continuation
         }
