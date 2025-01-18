@@ -28,16 +28,28 @@ struct ContentView: View {
         VStack {
             List{
                 ForEach(vm.recipes ,id: \.uuid){recipe in
-                    let recipeDetail = vm.recipeDetails[recipe.uuid]!
-                    HStack{
-                        Rectangle().frame(width: 100, height: 100).overlay{
-                            if let img = recipeDetail.smallImage{
-                                Image(uiImage: img )
+                    if let recipeDetail = vm.recipeDetails[recipe.uuid]{
+                        HStack{
+                            Rectangle().frame(width: 200, height: 200).overlay{
+                                if let img = recipeDetail.smallImage{
+                                    Image(uiImage: img )
+                                }
                             }
+                            VStack{
+                                Text("\(recipe.name)")
+                                Text("\(recipe.)")
+                            }
+                            
+                        }.onDisappear{
+                            vm.recipeDetails[recipe.uuid] = nil
                         }
-                        Text("\(recipeDetail.uuid)")
-                    }.onAppear{
-                        vm.getRecipe(recipe: recipe)
+                    }else{
+                        HStack{
+                            Rectangle().frame(width: 200, height: 200)
+                            Text("Fetching \(recipe.name)")
+                        }.onAppear{
+                            vm.getRecipe(recipe: recipe)
+                        }
                     }
                 }
             }

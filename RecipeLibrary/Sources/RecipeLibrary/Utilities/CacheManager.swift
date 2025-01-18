@@ -83,10 +83,12 @@ actor CacheTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendab
     //I have to try convert Publishers to async sequence
     
     public func addTask(task: (K, Task<V, Never>)) async {
-        if let hit =  cache.object(forKey: task.0){
-            printF("cache hit for \(task.0)")
-            self.pipe!.yield((task.0, hit))
-        }else if !(runningTasks.contains(task.0)){
+//        if let hit =  cache.object(forKey: task.0){
+//            printF("cache hit for \(task.0)")
+//            self.pipe!.yield((task.0, hit))
+        //}else
+            
+        if !(runningTasks.contains(task.0)){
             runningTasks.insert(task.0)
             printF("added Task for \(task.0)")
             let object = await task.1.value
@@ -127,14 +129,15 @@ actor CacheTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendab
         }
     }
    
-//    public func getHit( key : K) -> Bool{
-//        if let hit =  cache.object(forKey: key){
-//            self.pipe!.yield((key, hit))
-//            return true
-//        }
-//        return false
-//
-//    }
+    public func getHit( key : K) -> Bool{
+        if let hit =  cache.object(forKey: key){
+                        printF("cache hit for \(key)")
+            
+            self.pipe!.yield((key, hit))
+            return true
+        }
+        return false
+    }
    
     
 }
@@ -176,7 +179,7 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
     private let folder: String
 
     
-    init(maxTasks: Int, cacheCostLimit: Int, cacheCountLimit: Int) {
+    init() {
         self.runningTasks = []
         self.folder = "filecache_\(Date.now.hashValue)_\(FolderCount.counter)"
         self.createFolder()
@@ -240,10 +243,7 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
 
     
     public func addTask(task: (K, Task<V, Never>)) async {
-        if let hit =  getCache(forKey: task.0){
-            printF("cache hit for \(task.0)")
-            self.pipe!.yield((task.0, hit))
-        }else if !(runningTasks.contains(task.0)){
+        if !(runningTasks.contains(task.0)){
             runningTasks.insert(task.0)
             printF("added Task for \(task.0)")
             let object = await task.1.value
@@ -255,6 +255,14 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
     
     private func completeTask(key: K, result: V){
         self.pipe!.yield((key, result))
+    }
+    public func getHit(key :  K) -> Bool{
+        if let hit =  getCache(forKey: key){
+            printF("cache hit for \(key)")
+            self.pipe!.yield((key, hit))
+            return true
+        }
+        return false
     }
 
     //cannot access AsyncContinuation before fully init

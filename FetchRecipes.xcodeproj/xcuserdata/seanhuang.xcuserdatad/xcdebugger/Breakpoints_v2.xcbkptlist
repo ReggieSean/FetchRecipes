@@ -55,16 +55,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5BA8D156-8AC2-455F-9982-A41A1D35841B"
+            uuid = "DBEF4ACE-810D-48D3-8079-1AAEFFEA838C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RecipeLibrary/Sources/RecipeLibrary/Utilities/CacheManager.swift"
+            filePath = "RecipeLibrary/Sources/RecipeLibrary/ViewModels/RecipeListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
-            landmarkName = "addTask(task:)"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
+            landmarkName = "getRecipe(recipe:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
