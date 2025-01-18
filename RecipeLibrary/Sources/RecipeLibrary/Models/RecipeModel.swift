@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 
 ///temporary Json contianer holder to skip invalid Recipe
-public class RecipeModelList: Codable, AsyncDebugLogger{
+public class RecipeModelList: Codable, DebugLogger{
     var recipes: [RecipeModel]
     required public init(from decoder: any Decoder) throws{
         let container  = try decoder.container(keyedBy: CodingKeys.self)
@@ -19,9 +19,14 @@ public class RecipeModelList: Codable, AsyncDebugLogger{
         while !recipesArray.isAtEnd{
             do{
                 let rec = try recipesArray.decode(RecipeModel.self)
-                recipes.append(rec)
+                if rec.uuid != "" , rec.name != "" , rec.cuisine != ""{
+                    recipes.append(rec)
+                    //printF("Appended: \(rec)")
+                }else{
+                    //printF("Appended: \(rec)")
+                }
             } catch{
-                printF("Skipping an invalid recipe")
+                printF("Decoding Error for RecipeModel")
             }
         }
     }
@@ -69,15 +74,15 @@ public final class RecipeModel : Codable, Sendable, CustomStringConvertible, Asy
    
     /// Return an empty recipe when a receipe received is not valid
     required public convenience init(from decoder: any Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            let name = try container.decode(String.self, forKey: .name)
-            let uuid = try container.decode(String.self, forKey: .uuid)
-            let cuisine = try container.decode(String.self, forKey: .cuisine)
-            let largePhotoURL = try? container.decodeIfPresent(String.self, forKey: .largePhotoURL) ?? ""
-            let smallPhotoURL = try? container.decodeIfPresent(String.self, forKey: .smallPhotoURL) ?? ""
-            let sourceURL = try? container.decodeIfPresent(String.self, forKey: .sourceURL) ?? ""
-            let youtubeURL = try? container.decodeIfPresent(String.self, forKey: .youtubeURL) ?? ""
-            self.init(cuisine: cuisine, name: name, uuid: uuid, smallPhotoURL: smallPhotoURL!, largePhotoURL: largePhotoURL!, sourceURL: sourceURL!,youtubeURL: youtubeURL!)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let name = try? container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        let uuid = try? container.decodeIfPresent(String.self, forKey: .uuid) ?? ""
+        let cuisine = try? container.decodeIfPresent(String.self, forKey: .cuisine) ?? ""
+        let largePhotoURL = try? container.decodeIfPresent(String.self, forKey: .largePhotoURL) ?? ""
+        let smallPhotoURL = try? container.decodeIfPresent(String.self, forKey: .smallPhotoURL) ?? ""
+        let sourceURL = try? container.decodeIfPresent(String.self, forKey: .sourceURL) ?? ""
+        let youtubeURL = try? container.decodeIfPresent(String.self, forKey: .youtubeURL) ?? ""
+        self.init(cuisine: cuisine!, name: name!, uuid: uuid!, smallPhotoURL: smallPhotoURL!, largePhotoURL: largePhotoURL!, sourceURL: sourceURL!,youtubeURL: youtubeURL!)
             //self.init(cuisine: "Empty", name: "Empty", uuid: "Empty")
     }
         
@@ -85,14 +90,14 @@ public final class RecipeModel : Codable, Sendable, CustomStringConvertible, Asy
 
 
 final public class RecipeDetail : Sendable, Equatable, Codable,CustomStringConvertible, AsyncDebugLogger{
-    let uuid : String
-    let bigImage :UIImage?
-    let smallImage: UIImage?
+    public let uuid : String
+    public let bigImage :UIImage?
+    public let smallImage: UIImage?
     public var description: String{
         return "uuid:\(uuid)+ bigImage(\(String(describing: bigImage)) + smallImage(\(String(describing: smallImage))"
     }
     
-    init(uuid: String,bigImage:  UIImage, smallImage: UIImage) {
+    init(uuid: String,bigImage:  UIImage?, smallImage: UIImage?) {
         self.uuid = uuid
         self.bigImage = bigImage
         self.smallImage = smallImage

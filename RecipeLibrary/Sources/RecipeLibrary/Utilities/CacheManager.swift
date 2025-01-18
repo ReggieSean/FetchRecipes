@@ -212,7 +212,7 @@ actor FileTaskManager<K: AnyObject & Hashable & Sendable,V : AnyObject & Sendabl
     
     //Function has no risk of race
     nonisolated private func folderPath() -> URL?{
-        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(folder)
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(self.folder)
     }
     
     private func cachePath(key: K) -> URL?{

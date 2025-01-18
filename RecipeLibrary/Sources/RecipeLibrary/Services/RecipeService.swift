@@ -58,7 +58,7 @@ class ProductionRecipeService: AsyncDebugLogger{
         } catch{
             print("Download error for url:\(url)")
         }
-        return  UIImage(named: "404", in: .module, with: nil)!
+        return  UIImage(named: "404.png", in: .module, with: nil)!
     }
 }
 
@@ -107,21 +107,14 @@ public class MockRecipeService : AsyncDebugLogger{
     
     ///When backend is not providing valid recipe fields, test if your decoder works
     public static func getMalformedRecipes() -> [RecipeModel]{
-        if let url = Bundle.main.url(forResource: "malformed", withExtension: "json") {
+        if let url = Bundle.module.url(forResource: "malformed", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
-                let dataArray = try data.map{ try JSONSerialization.data(withJSONObject: $0)}
-                let recipes : [RecipeModel] = dataArray.compactMap{data in
-                    do{
-                        return try JSONDecoder().decode(RecipeModel.self, from: data)
-                    } catch{
-                       printF("skipping invalid data")
-                        return nil
-                    }
-                }
-                return recipes
+                let recipeList =  try JSONDecoder().decode( RecipeModelList.self, from: data)
+                return recipeList.recipes
             } catch {
                 printF("Error: \(error)")
+                return []
             }
         }
         printF("Error: Cannot load resource url")

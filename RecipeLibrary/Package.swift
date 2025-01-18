@@ -12,17 +12,12 @@ let package = Package(
             name: "RecipeLibrary",
             targets: ["RecipeLibrary"]),
     ],
-    dependencies: [
-            .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"), // Add swift-collections
-    ],
+    
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "RecipeLibrary",
-            dependencies: [
-                            .product(name: "Collections", package: "swift-collections"), // Add Collections product
-            ],
             resources: [.process("Services/TestRecipes"), .process("Assets")]
         ),
         .testTarget(

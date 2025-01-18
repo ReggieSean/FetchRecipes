@@ -1,7 +1,7 @@
 import XCTest
 @testable import RecipeLibrary
 
-final class RecipeLibraryTests: XCTestCase , Logger{
+final class RecipeLibraryTests: XCTestCase , Logger, InfoPrinter{
     
     /// Test Fetching the test recipe list
     @MainActor
@@ -22,23 +22,41 @@ final class RecipeLibraryTests: XCTestCase , Logger{
         Self.printF("Got empty recipes")
         XCTAssertTrue(vm.recipes.count == 0)
     }
+    
+    @MainActor
+    /// Test Fetching an empty recipe list
+    func testGettingMalformedRecipe() async throws {
+        let vm = RecipeListViewModel(services: ServiceFactory.get(service: "malformed"))
+        await vm.getAllRecipes().value
+        Self.printF("Got empty recipes")
+        try await Task.sleep(for: .seconds(4))
+        XCTAssertTrue(vm.recipes.count == 1)
+        XCTAssertTrue(vm.recipes[0].name == "New York Cheesecake")
+    }
    
     @MainActor
     /// Test fetching the test recipe list and detail of each(images)
-    func testGettingSampleRecipes() async throws {
-        let vm = RecipeListViewModel(services: ServiceFactory.get(service: "mock"))
+    func testGettingMalformedRecipes() async throws {
+        let vm = RecipeListViewModel(services: ServiceFactory.get(service: "malformed"))
         await vm.getAllRecipes().value
-        for recipe in vm.recipes{
-            Task{
-                await vm.getRecipe(recipe: recipe).value
+        await withTaskGroup(of: Task<Void,Never>.self){group in
+            for recipe in vm.recipes{
+                group.addTask{ @MainActor in
+                    vm.getRecipe(recipe: recipe)
+                }
+            }
+            for await  result in group{
+                printF("Finished a group task at \(Date.now)")
             }
         }
+        // wait till main actor received all result across actor boundary
+        printF("Waiting till actor finsihes")
         try await Task.sleep(for: .seconds(4))
-        
     }
     @MainActor
    /// Test fetching every recipe that production endpoint provides.
     func testGettingProductionRecipe() async throws {
+        Self.printModuleResources()
         let vm = RecipeListViewModel(services: ServiceFactory.get(service: "production"))
         await vm.getAllRecipes().value
         await withTaskGroup(of: Task<Void,Never>.self){group in
@@ -63,23 +81,7 @@ final class RecipeLibraryTests: XCTestCase , Logger{
     /// Test fetching every recipe that production endpoint provides with time out sometimes
     @MainActor
     func testGettingProductionRecipeWithTimeOut() async throws {
-        guard let resourceURL = Bundle.module.resourceURL else {
-                print("No resource URL found for module.")
-                return
-            }
-
-            
-        do {
-            let resourceContents = try FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil, options: [])
-            print("Resources in module:")
-            for file in resourceContents {
-                print(file.lastPathComponent)
-            }
-            
-        } catch {
-            print("Failed to list resources: \(error)")
-            
-        }
+        
         let vm = RecipeListViewModel(services: ServiceFactory.get(service: "random_timeout"))
         await vm.getAllRecipes().value
         await withTaskGroup(of: Task<Void,Never>.self){group in
@@ -98,10 +100,6 @@ final class RecipeLibraryTests: XCTestCase , Logger{
         XCTAssertTrue(true)
     }
     
-    
-    func testGettingProducionRecipeWithTaskCacheManager() async throws{
-        
-    }
     
 
 }

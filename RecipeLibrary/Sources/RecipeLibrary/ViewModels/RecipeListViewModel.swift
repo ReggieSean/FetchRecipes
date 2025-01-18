@@ -26,6 +26,7 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
         return "\(key)"
     }
 }
+
 @MainActor public class RecipeListViewModel : ObservableObject, AsyncDebugLogger{
     
     let services : RecipeService
@@ -72,15 +73,18 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
         self.loop?.cancel()
 //        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
         self.cache = FileTaskManager(maxTasks: 10, cacheCostLimit: 100,cacheCountLimit: 100)
-
     }
-    
    
     public func getAllRecipes() -> Task<Void, Never>{
         return Task{
             await self.startCache()
+            //valid recipes with required fields
             let recipes =  await services.allRecipes()
             self.recipes = recipes
+            //adding stub models before recipe detail are received
+            for recipe in self.recipes{
+                self.recipeDetails[recipe.uuid] = RecipeDetail(uuid: recipe.uuid ,bigImage: nil, smallImage: nil)
+            }
         }
     }
     

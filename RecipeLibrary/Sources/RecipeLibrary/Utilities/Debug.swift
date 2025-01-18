@@ -24,7 +24,7 @@ public protocol AsyncDebugLogger{
 
 public extension AsyncDebugLogger{
     
-    /// Call this fucntion with CallingClass.printF(), not capturing an instance
+    /// Call this fucntion with CallingClass.printF(), not capturing an instance, might not show when mainthread is being crowded by urgent task
     /// - Parameters:
     ///   - str: message
     ///   - file: leave blank for caller to fill
@@ -121,5 +121,30 @@ public extension Logger{
         print(str)
         print("\n")
         fflush(stdout)
+    }
+}
+
+protocol InfoPrinter{
+    
+}
+extension InfoPrinter{
+    static func printModuleResources(){
+        guard let resourceURL = Bundle.module.resourceURL else {
+                    print("No resource URL found for module.")
+                    return
+                }
+
+                
+            do {
+                let resourceContents = try FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil, options: [])
+                print("Resources in module:")
+                for file in resourceContents {
+                    print(file.lastPathComponent)
+                }
+                
+            } catch {
+                print("Failed to list resources: \(error)")
+                
+            }
     }
 }
