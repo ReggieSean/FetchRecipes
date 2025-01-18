@@ -41,12 +41,12 @@ public final class RecipeModel : Codable, Sendable, CustomStringConvertible, Asy
         return "\(name),\(cuisine),\(uuid)|\n \(smallPhotoURL),\(largePhotoURL),\(sourceURL),\(youtubeURL)"
     }
     
-    let cuisine: String
-    let name: String
+    public let cuisine: String
+    public let name: String
     let smallPhotoURL: String
     let largePhotoURL: String
-    let sourceURL: String
-    let youtubeURL: String
+    public let sourceURL: String
+    public let youtubeURL: String
     public let uuid: String
     
 

@@ -24,40 +24,69 @@ struct ContentView: View {
             self.vm = RecipeListViewModel(services: ServiceFactory.get(service: "production"))
         }
     }
+    
+    @State var popUp : Bool = false
+    @State var selectedRecipe : RecipeModel? = nil
     var body: some View {
-        VStack {
-            List{
-                ForEach(vm.recipes ,id: \.uuid){recipe in
-                    if let recipeDetail = vm.recipeDetails[recipe.uuid]{
-                        HStack{
-                            Rectangle().frame(width: 200, height: 200).overlay{
-                                if let img = recipeDetail.smallImage{
-                                    Image(uiImage: img )
+        NavigationStack{
+            VStack {
+                List{
+                    ForEach(vm.recipes ,id: \.uuid){recipe in
+                        if let recipeDetail = vm.recipeDetails[recipe.uuid]{
+                            Button(action: {
+                                selectedRecipe = recipe
+                                popUp = !popUp
+                            }){
+                                HStack{
+                                    Rectangle().frame(width: 100, height: 100).overlay{
+                                        if let img = recipeDetail.smallImage{
+                                            Image(uiImage: img)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 100, height: 100)
+                                                .clipped()
+                                        }
+                                    }
+                                    VStack(alignment: .leading){
+                                        Text("\(recipe.name)")
+                                        Text("\(recipe.cuisine)")
+                                    }
+                                    
+                                }.onDisappear{
+                                    vm.recipeDetails[recipe.uuid] = nil
                                 }
+                            }.foregroundStyle(.black)
+
+                        }else{
+                            HStack{
+                                Rectangle().frame(width: 100, height: 100)
+                                Text("Fetching \(recipe.name)")
+                            }.onAppear{
+                                vm.getRecipe(recipe: recipe)
                             }
-                            VStack{
-                                Text("\(recipe.name)")
-                                Text("\(recipe.)")
-                            }
-                            
-                        }.onDisappear{
-                            vm.recipeDetails[recipe.uuid] = nil
-                        }
-                    }else{
-                        HStack{
-                            Rectangle().frame(width: 200, height: 200)
-                            Text("Fetching \(recipe.name)")
-                        }.onAppear{
-                            vm.getRecipe(recipe: recipe)
                         }
                     }
                 }
+            }.task{
+                await vm.getAllRecipes().value
+                print("Got all recipes")
             }
-        }.task{
-            await vm.getAllRecipes().value
-            print("Got all recipes")
-        }
-        .padding()
+            .padding()
+            .sheet(isPresented: $popUp){
+                VStack(alignment: .leading){
+                    Button("Close"){
+                        popUp.toggle()
+                    }.padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))
+                    
+                    Text("\(selectedRecipe?.name ?? "")")
+                    Text("\(selectedRecipe?.cuisine ?? "")")
+                    Text("Youtube:\(selectedRecipe?.youtubeURL ?? "")")
+                    Text("Source:\(selectedRecipe?.sourceURL ?? "")")
+                    Spacer()
+                }
+            }
+        }.navigationTitle("Recipes")
+        
     }
 }
 

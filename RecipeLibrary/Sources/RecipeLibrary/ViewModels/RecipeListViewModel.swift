@@ -31,8 +31,8 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     
     let services : RecipeService
 //    var cache : any AsyncCache
-//    var cache: CacheTaskManager<CacheKey , RecipeDetail> =  CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
-    var cache: FileTaskManager<CacheKey, RecipeDetail> = FileTaskManager()
+    var cache: CacheTaskManager<CacheKey , RecipeDetail> =  CacheTaskManager<CacheKey , RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+//    var cache: FileTaskManager<CacheKey, RecipeDetail> = FileTaskManager()
     var pipeFromCache : AsyncStream<(CacheKey, RecipeDetail)>?
     var loop : Task<Void, Never>?
     @Published public var recipes : [RecipeModel] = []
@@ -71,8 +71,8 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     
     public func flushCache(){
         self.loop?.cancel()
-//        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
-        self.cache = FileTaskManager()
+        self.cache = CacheTaskManager<CacheKey,  RecipeDetail>(maxTasks: 10, cacheCostLimit: 5000, cacheCountLimit: 200)
+//        self.cache = FileTaskManager()
     }
    
     public func getAllRecipes() -> Task<Void, Never>{
