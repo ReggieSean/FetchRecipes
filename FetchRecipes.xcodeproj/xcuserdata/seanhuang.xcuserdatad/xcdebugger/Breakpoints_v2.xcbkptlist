@@ -62,8 +62,8 @@
             filePath = "RecipeLibrary/Sources/RecipeLibrary/ViewModels/RecipeListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "getRecipe(recipe:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -88,7 +88,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "D3EFD276-FC9B-4C29-8F95-5905D6578D7E"
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FetchRecipesUITests/FetchRecipesUITests.swift"

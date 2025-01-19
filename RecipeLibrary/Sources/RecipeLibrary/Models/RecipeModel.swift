@@ -23,9 +23,12 @@ public class RecipeModelList: Codable, DebugLogger{
                     recipes.append(rec)
                     //printF("Appended: \(rec)")
                 }else{
+                    self.recipes = []
+                    throw APIError.decodeError(decodableType: String(describing: Self.self))
                     //printF("Appended: \(rec)")
                 }
-            } catch{
+            } catch let error{
+                throw error
                 printF("Decoding Error for RecipeModel")
             }
         }
@@ -35,7 +38,7 @@ public class RecipeModelList: Codable, DebugLogger{
     }
 }
 
-
+/// Individual recipes that are 
 public final class RecipeModel : Codable, Sendable, CustomStringConvertible, AsyncDebugLogger{
     public var description: String {
         return "\(name),\(cuisine),\(uuid)|\n \(smallPhotoURL),\(largePhotoURL),\(sourceURL),\(youtubeURL)"

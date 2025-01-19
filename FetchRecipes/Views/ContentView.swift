@@ -70,10 +70,17 @@ struct ContentView: View {
                         }
                     }
                 }.navigationTitle("Recipes")
+                    .refreshable {
+                        Task{
+                            await vm.getAllRecipes().value
+                            print("Refreshed recipes")
+                        }
+                    }
                     .listStyle(PlainListStyle())
                     .task{
                         await vm.getAllRecipes().value
                         print("Got all recipes")
+                        
                     }
             }
             .padding()

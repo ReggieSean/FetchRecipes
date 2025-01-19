@@ -77,15 +77,6 @@ public class MockRecipeService : AsyncDebugLogger{
                 let data = try Data(contentsOf: url)
 //                printF("Here")
                 let recipeList =  try JSONDecoder().decode( RecipeModelList.self, from: data)
-//                printF("THere")
-//                let recipes : [RecipeModel] = dataArray.compactMap{data in
-//                    do{
-//                        return try JSONDecoder().decode(RecipeModel.self, from: data)
-//                    } catch{
-//                        printF("skipping invalid data")
-//                        return nil
-//                    }
-//                }
                 for recipe in recipeList.recipes{
                     printF("Recipe: \(recipe)")
                 }
@@ -104,17 +95,8 @@ public class MockRecipeService : AsyncDebugLogger{
         if let url = Bundle.module.url(forResource: "2000_sample", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
-//                printF("Here")
                 let recipeList =  try JSONDecoder().decode( RecipeModelList.self, from: data)
-//                printF("THere")
-//                let recipes : [RecipeModel] = dataArray.compactMap{data in
-//                    do{
-//                        return try JSONDecoder().decode(RecipeModel.self, from: data)
-//                    } catch{
-//                        printF("skipping invalid data")
-//                        return nil
-//                    }
-//                }
+
                 for recipe in recipeList.recipes{
                     printF("Recipe: \(recipe)")
                 }

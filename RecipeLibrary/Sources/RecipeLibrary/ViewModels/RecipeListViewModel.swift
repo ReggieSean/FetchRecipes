@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 
 //String are not Objects because they are value type, so a wrapper that's not modifiable is needed here
+/// Wrapper class for Caches' keys
 final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     let key: String
     func hash(into hasher: inout Hasher) {
@@ -27,6 +28,7 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
     }
 }
 
+/// ViewModel for recipe list
 @MainActor public class RecipeListViewModel : ObservableObject, AsyncDebugLogger{
     
     let services : RecipeService

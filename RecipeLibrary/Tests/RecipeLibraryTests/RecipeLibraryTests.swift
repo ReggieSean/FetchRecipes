@@ -1,7 +1,7 @@
 import XCTest
 @testable import RecipeLibrary
 
-final class RecipeLibraryTests: XCTestCase , Logger, InfoPrinter{
+public final class RecipeLibraryTests: XCTestCase , Logger, InfoPrinter{
     
     /// Test Fetching the test recipe list
     @MainActor
@@ -30,8 +30,7 @@ final class RecipeLibraryTests: XCTestCase , Logger, InfoPrinter{
         await vm.getAllRecipes().value
         Self.printF("Got empty recipes")
         try await Task.sleep(for: .seconds(4))
-        XCTAssertTrue(vm.recipes.count == 1)
-        XCTAssertTrue(vm.recipes[0].name == "New York Cheesecake")
+        XCTAssertTrue(vm.recipes.count == 0)
     }
    
     @MainActor

@@ -8,8 +8,8 @@
 
 
 import Foundation
-///Logging extension for unified printing
-///Usage: Extend these protocols to a class, actor or struct, and print with printF or Self.printF whether it's in async context,or sync context in instance or static functions.
+///Async Logging extension for unified printing
+//Usage: Extend the protocol to a class, actor or struct, and print with printF or Self.printF whether it's in async context,or sync context in instance or static functions.
 @available(iOS 16.0, *)
 public protocol AsyncDebugLogger{
     ///Print a formatted output string,
@@ -60,6 +60,7 @@ public extension AsyncDebugLogger{
     }
 }
 
+///Debug Logging extension for unified printing
 @available(iOS 16.0, *)
 public protocol DebugLogger{
     ///Print a formatted output string,
@@ -106,6 +107,7 @@ public extension DebugLogger{
     }
 }
 
+///Logging extension for unified printing
 public protocol Logger{
     ///Print a formatted output string
     /// - Parameter str: Main text without formatting
