@@ -10,7 +10,7 @@ import RecipeLibrary
 
 
 struct ContentView: View {
-    
+    @Environment(\.colorScheme) var colorScheme
     @ObservedObject var vm : RecipeListViewModel
     init(){
         if CommandLine.arguments.contains("--mock"){
@@ -29,13 +29,13 @@ struct ContentView: View {
     @State var selectedRecipe : RecipeModel? = nil
     var body: some View {
         NavigationStack{
-            VStack {
+            HStack {
                 List{
                     ForEach(vm.recipes ,id: \.uuid){recipe in
                         if let recipeDetail = vm.recipeDetails[recipe.uuid]{
                             Button(action: {
                                 selectedRecipe = recipe
-                                popUp = !popUp
+                                popUp.toggle()
                             }){
                                 HStack{
                                     Rectangle().frame(width: 100, height: 100).overlay{
@@ -55,8 +55,8 @@ struct ContentView: View {
                                 }.onDisappear{
                                     vm.recipeDetails[recipe.uuid] = nil
                                 }
-                            }.foregroundStyle(.black)
-
+                            }.foregroundStyle(self.colorScheme == ColorScheme.light ? .black : .white)
+                            
                         }else{
                             HStack{
                                 Rectangle().frame(width: 100, height: 100)
@@ -66,28 +66,39 @@ struct ContentView: View {
                             }
                         }
                     }
-                }
-            }.task{
-                await vm.getAllRecipes().value
-                print("Got all recipes")
+                }.navigationTitle("Recipes")
+                    .listStyle(PlainListStyle())
+                    .task{
+                        await vm.getAllRecipes().value
+                        print("Got all recipes")
+                    }
             }
             .padding()
             .sheet(isPresented: $popUp){
-                VStack(alignment: .leading){
-                    Button("Close"){
-                        popUp.toggle()
-                    }.padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))
-                    
-                    Text("\(selectedRecipe?.name ?? "")")
-                    Text("\(selectedRecipe?.cuisine ?? "")")
-                    Text("Youtube:\(selectedRecipe?.youtubeURL ?? "")")
-                    Text("Source:\(selectedRecipe?.sourceURL ?? "")")
-                    Spacer()
-                }
+                RecipeDetailSheet(selectedRecipe: $selectedRecipe, popUp: $popUp)
             }
-        }.navigationTitle("Recipes")
+        }
         
     }
+}
+struct RecipeDetailSheet : View{
+    @Binding var selectedRecipe : RecipeModel?
+    @Binding var popUp : Bool
+    
+    var body : some View{
+        VStack(alignment: .leading){
+            Button("Close"){
+                popUp.toggle()
+            }.padding(EdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0))
+            
+            Text("\(selectedRecipe?.name ?? "")")
+            Text("\(selectedRecipe?.cuisine ?? "")")
+            Text("Youtube:\n\(selectedRecipe?.youtubeURL ?? "")")
+            Text("Source:\n\(selectedRecipe?.sourceURL ?? "")")
+            Spacer()
+        }
+    }
+
 }
 
 #Preview {

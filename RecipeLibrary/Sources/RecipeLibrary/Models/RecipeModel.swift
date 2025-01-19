@@ -62,7 +62,7 @@ public final class RecipeModel : Codable, Sendable, CustomStringConvertible, Asy
         case youtubeURL = "youtube_url"    ///The URL of the recipe's YouTube video.
     }
     
-    init(cuisine: String, name: String, uuid: String , smallPhotoURL: String = "", largePhotoURL: String = "", sourceURL: String = "", youtubeURL: String = "") {
+    public init(cuisine: String, name: String, uuid: String , smallPhotoURL: String = "", largePhotoURL: String = "", sourceURL: String = "", youtubeURL: String = "") {
         self.cuisine = cuisine
         self.name = name
         self.uuid = uuid
