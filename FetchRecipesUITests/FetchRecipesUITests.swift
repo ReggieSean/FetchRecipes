@@ -53,6 +53,14 @@ final class FetchRecipesUITests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
     }
+    @MainActor
+    func testLargeMockService() throws {
+        app.launchArguments = ["--2000_mock"]
+        app.launch()
+        // UI tests must launch the application that they test.
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        
+    }
 
     @MainActor
     func testLaunchPerformance() throws {

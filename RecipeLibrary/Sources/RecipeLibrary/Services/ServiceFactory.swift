@@ -16,6 +16,8 @@ public class ServiceFactory {
                 return  RecipeService(allRecipes: ProductionRecipeService.getAllRecipes, downloadImage:  ProductionRecipeService.downloadImage)
             case "mock":
                 return RecipeService(allRecipes: MockRecipeService.getAllRecipes, downloadImage: ProductionRecipeService.downloadImage)
+            case "2000_mock":
+                return RecipeService(allRecipes: MockRecipeService.getALotOfRecipes, downloadImage: ProductionRecipeService.downloadImage)
             case "empty":
                 return RecipeService(allRecipes: MockRecipeService.getAllButEmptyRecipes, downloadImage: ProductionRecipeService.downloadImage)
             case "malformed":

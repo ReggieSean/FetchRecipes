@@ -19,6 +19,9 @@ struct ContentView: View {
         } else if CommandLine.arguments.contains("--malformed"){
             print("Malformed service")
             self.vm = RecipeListViewModel(services: ServiceFactory.get(service: "malformed"))
+        } else if CommandLine.arguments.contains("--2000_mock"){
+            print("A Lot Of Recipes service")
+            self.vm = RecipeListViewModel(services: ServiceFactory.get(service: "2000_mock"))
         }else {
             print("Production service")
             self.vm = RecipeListViewModel(services: ServiceFactory.get(service: "production"))
