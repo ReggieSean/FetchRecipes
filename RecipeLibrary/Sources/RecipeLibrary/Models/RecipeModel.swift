@@ -38,7 +38,7 @@ public class RecipeModelList: Codable, DebugLogger{
     }
 }
 
-/// Individual recipes that are 
+/// Individual recipes that are
 public final class RecipeModel : Codable, Sendable, CustomStringConvertible, AsyncDebugLogger{
     public var description: String {
         return "\(name),\(cuisine),\(uuid)|\n \(smallPhotoURL),\(largePhotoURL),\(sourceURL),\(youtubeURL)"

@@ -70,6 +70,9 @@ final class CacheKey: AnyObject, Sendable, Hashable, CustomStringConvertible{
             printF("Stopped cache receiving loop at deinit")
         }
     }
+    public func removeDetail(key : String){
+        self.recipeDetails.removeValue(forKey: key)
+    }
     
     public func flushCache(){
         self.loop?.cancel()

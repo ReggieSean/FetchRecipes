@@ -24,11 +24,10 @@ public final class RecipeLibraryTests: XCTestCase , Logger, InfoPrinter{
     }
     
     @MainActor
-    /// Test Fetching an empty recipe list
+    /// Test Fetching malformed recipes that will return empty list
     func testGettingMalformedRecipe() async throws {
         let vm = RecipeListViewModel(services: ServiceFactory.get(service: "malformed"))
         await vm.getAllRecipes().value
-        Self.printF("Got empty recipes")
         try await Task.sleep(for: .seconds(4))
         XCTAssertTrue(vm.recipes.count == 0)
     }

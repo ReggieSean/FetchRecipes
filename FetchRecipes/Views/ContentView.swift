@@ -56,7 +56,7 @@ struct ContentView: View {
                                     }
                                     
                                 }.onDisappear{
-                                    vm.recipeDetails[recipe.uuid] = nil
+                                    vm.removeDetail(key: recipe.uuid)
                                 }
                             }.foregroundStyle(self.colorScheme == ColorScheme.light ? .black : .white)
                             
