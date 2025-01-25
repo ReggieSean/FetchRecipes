@@ -4,8 +4,8 @@ This is a library package for fetching recipes provided by Fetch. It was develop
 To run the app, build the app with target set to a simulator or a physical iOS device.
 
 ## Focus Areas:
-I focused on these areas beacuse I tried to learn the patter of what make a good iOS. All three of these focuses improve the maintainability and extensibility of the code, and I agree with that Swift concurrency is the modern approach and it needs some more digging to its full potential.
-- Architecture: Good and clear architecture can bring the overhead down in future. It allows good extendability and and ergonomics for smooth development. This project is mainly using MVVM architecture. 
+I focused on these areas beacuse I tried to learn the pattern of what make a good iOS. All three of these focuses improve the maintainability and extensibility of the code, and I agree with that Swift concurrency is the modern approach and it needs some more digging to its full potential.
+- Architecture: Good and clear architecture can bring the overhead down in future. It allows good extendability and ergonomics for smooth development. This project is mainly using MVVM architecture. 
     - Model: 
         All recipes in the file ``RecipeModel``.swift
     - ViewModel: 
